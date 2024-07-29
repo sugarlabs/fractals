@@ -1,0 +1,7 @@
+[Activity]
+name = Fractals
+bundle_id = org.sugarlabs.Fractals
+exec = sugar-activity3 activity.FractalsActivity
+icon = activity-fractals
+activity_version = 1
+license = GPLv3+
