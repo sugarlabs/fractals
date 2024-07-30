@@ -30,7 +30,9 @@ from gi.repository import Gtk
 import pygame
 pygame.init()
 
-BASE_RES = (800, 600)
+from gamestatemanager import GameStateManager
+from states.simulator import Simulator
+
 FPS = 30
 
 
@@ -40,19 +42,28 @@ class Fractals:
         self.clock = pygame.time.Clock()
 
     def fill_bg(self):
-        self.screen.fill("cyan")
+        self.screen.fill("white")
 
     def run(self):
         self.screen = pygame.display.set_mode((0, 0))
+
+        self.gameStateManager = GameStateManager("simulator")
+        self.states = {}
+        self.states["simulator"] = Simulator(self)
+
         self.is_running = True
         while self.is_running:
+            curr_state = self.states[self.gameStateManager.get_state()]
+
             while Gtk.events_pending():
                 Gtk.main_iteration()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.is_running = False
+                curr_state.handle_event(event)
 
             self.fill_bg()
+            curr_state.run()
 
             pygame.display.update()
             self.clock.tick(FPS)
