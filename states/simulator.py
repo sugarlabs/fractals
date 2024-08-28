@@ -23,6 +23,10 @@
 import pygame
 import math
 
+from components.slider import Slider
+from components.simulatebutton import SimulateButton
+from components.fractaliterator import FractalIterator
+
 
 class Simulator:
     def __init__(self, game):
@@ -30,116 +34,13 @@ class Simulator:
         self.gameStateManager = game.gameStateManager
         self.game = game
 
-        self.sidebar = pygame.Surface((0.3 * self.screen.get_width(), self.screen.get_height()))
+        self.sidebar = pygame.Surface((214, self.screen.get_height()))
         self.sidebar_rect = self.sidebar.get_rect(topleft=(0, 0))
-        self.renderer = pygame.Surface((0.7 * self.screen.get_width(), self.screen.get_height()))
-        self.renderer_rect = self.renderer.get_rect(topleft=(0.3 * self.screen.get_width(), 0))
+        self.renderer = pygame.Surface((self.screen.get_width() - 214, self.screen.get_height()))
+        self.renderer_rect = self.renderer.get_rect(topleft=(214, 0))
 
-        self.fractals = {
-            "snowflake": {
-                "sentence": "F++F++F++",
-                "rules": {
-                    "F": "F-F++F-F"
-                },
-                "params": {
-                    "angle": 60,
-                    "length": 1,
-                    "iterations": 0,
-                    "initial angle": 180
-                }
-            },
-
-            "test": {
-                "sentence": "F-F-F+F+FX++F-F-F+F+FX--F-F-F+F+FX",
-                "rules": {
-                    "X" : "F-F-F+F+FX++F-F-F+F+FX--F-F-F+F+FX",
-                    "F": ""
-                },
-                "params": {
-                    "angle": 60,
-                    "length": 1,
-                    "iterations": 0,
-                    "initial angle": 0
-                }
-            },
-
-            "levy curve": {
-                "sentence": "F++F++F++F",
-                "rules": {
-                    "F": "-F++F-"
-                },
-                "params": {
-                    "angle": 45,
-                    "length": 1,
-                    "iterations": 0,
-                    "initial angle": 0
-                }
-            },
-
-            "serpinski triangle": {
-                "sentence": "F-G-G",
-                "rules": {
-                    "F": "F-G+F+G-F",
-                    "G": "GG"
-                },
-                "params": {
-                    "angle": 120,
-                    "length": 1,
-                    "iterations": 0,
-                    "initial angle": 0
-                }
-            },
-
-            "plant": {
-                "sentence": "F-[[X]+X]+F[+FX]-X",
-                "rules": {
-                    "X": "F-[[X]+X]+F[+FX]-X",
-                    "F": "FF"
-                },
-                "params": {
-                    "angle": 25,
-                    "length": 1,
-                    "iterations": 0,
-                    "initial angle": -90
-                }
-            },
-            "binary tree": {
-                "sentence": "F",
-                "rules": {
-                    "F": "G[-GFFF][+FFFG]",
-                    "G": "GG"
-                },
-                "params": {
-                    "angle": 30,
-                    "length": 0.29,
-                    "iterations": 1,
-                    "initial angle": -90
-                }
-            },
-            "peano curve": {
-                "sentence": "A",
-                "rules": {
-                    "A": "-BF+AFA+FB-",
-                    "B": "+AF-BFB-FA+",
-                    "C": ""
-                },
-                "params" : {
-                    "angle": 90,
-                    "length": 1,
-                    "iterations": 1,
-                    "initial angle": 0
-                }
-            }
-        }
-
-        self.fractal_index = -1
-        self.fractal_list = [key for key in self.fractals.keys()]
-
-        self.fractal = self.fractals[self.fractal_list[self.fractal_index]]
-        self.default_angle = self.fractal["params"]["angle"]
-        self.fractal_zoom = 0
-        self.inc_angle = False
-        self.draw_fractal()
+        self.populate_sidebar()
+        self.change_fractal()
     
     def generate(self, sentence, rules, iterations):
         start_string = sentence
@@ -190,15 +91,16 @@ class Simulator:
         stack = []
         params = self.fractal["params"]
         length = params["length"]
-        angle = params["angle"]
-        iterations = params["iterations"]
+        angle = self.angle_slider.val
+        iterations = self.depth_slider.val
+        thickness = self.thickness_slider.val
         sentence = self.generate(self.fractal["sentence"], self.fractal["rules"], iterations)
-        orig, scale, surf = self.get_orig_and_scale(sentence, angle, length, params["initial angle"])
+        orig, scale, surf = self.get_orig_and_scale(sentence, angle, length, self.initial_angle_slider.val)
         length *= scale
         surf_rect = surf.get_rect(center=(self.renderer.get_width()/2, self.renderer.get_height()/2))
         turtle = {
             "pos": orig,
-            "angle": params["initial angle"]
+            "angle": self.initial_angle_slider.val
         }
 
         color = 0
@@ -217,7 +119,7 @@ class Simulator:
                 rad = math.radians(turtle["angle"])
                 new_x = x + math.cos(rad) * length
                 new_y = y + math.sin(rad) * length
-                pygame.draw.line(surf, (255 - color, color, 125 + color / 2), (x, y), (new_x, new_y), 1)
+                pygame.draw.line(surf, (255 - color, color, 125 + color / 2), (x, y), (new_x, new_y), thickness)
                 turtle["pos"] = (new_x, new_y)
             color += dcolor
 
@@ -225,33 +127,50 @@ class Simulator:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.renderer_rect.collidepoint(pygame.mouse.get_pos()):
-                self.fractal["params"]["iterations"] += 1
-                self.fractal["params"]["angle"] = self.default_angle
-                self.inc_angle = False
+            for slider in self.sliders:
+                slider.handle_press()
+            if self.sim_button.check_press():
                 self.draw_fractal()
-            else:
-                self.fractal["params"]["iterations"] = 0
-                self.fractal["params"]["angle"] = self.default_angle
-                self.inc_angle = False
-                self.fractal_index += 1
-                self.fractal_index %= len(self.fractal_list)
-                self.fractal = self.fractals[self.fractal_list[self.fractal_index]]
-                self.default_angle = self.fractal["params"]["angle"]
-                self.draw_fractal()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_s:
-                self.inc_angle = not self.inc_angle
+            if self.fractal_iterator.handle_press():
+                self.change_fractal()
+        elif pygame.mouse.get_pressed()[0]:
+            for slider in self.sliders:
+                slider.update_slider_pos()
+    
+    def change_fractal(self):
+        self.fractal = self.fractal_iterator.get_curr_fractal()
+        self.angle_slider.val = self.fractal["params"]["angle"]
+        self.angle_slider.recalibrate_slider_pos()
+
+        self.depth_slider.val = self.fractal["params"]["iterations"]
+        self.depth_slider.recalibrate_slider_pos()
+
+        self.thickness_slider.val = 1
+        self.thickness_slider.recalibrate_slider_pos()
+        
+        self.initial_angle_slider.val = self.fractal["params"]["initial angle"]
+        self.initial_angle_slider.recalibrate_slider_pos()
+
+        self.renderer.fill("black")
 
     def render(self):
         self.screen.fill("black")
-        self.sidebarbar.fill((10, 10, 10))
+        self.sidebar.fill((10, 10, 10))
         self.screen.blit(self.sidebar, self.sidebar_rect)
-
+        self.fractal_iterator.draw(self.screen)
+        for slider in self.sliders:
+            slider.draw(self.screen)
+        self.screen.blit(self.sim_button.image, self.sim_button.rect)
         self.screen.blit(self.renderer, self.renderer_rect)
+    
+    def populate_sidebar(self):
+        self.fractal_iterator = FractalIterator(105, 30)
+        self.angle_slider = Slider(105, 90, 60, 10, "ANGLE", 180, -180)
+        self.thickness_slider = Slider(105, 150, 2, 1, "THICKNESS", 5, 1)
+        self.depth_slider = Slider(105, 210, 7, 1, "DEPTH", 9, 1)
+        self.initial_angle_slider = Slider(105, 270, 0, 10, "INITIAL ANGLE", 180, -180)
+        self.sliders = [self.angle_slider, self.thickness_slider, self.depth_slider, self.initial_angle_slider]
+        self.sim_button = SimulateButton(105, 330)
 
     def run(self):
-        if self.inc_angle:
-            self.fractal['params']['angle'] += 0.4
-        self.draw_fractal()
         self.render()
