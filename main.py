@@ -32,6 +32,7 @@ pygame.init()
 
 from gamestatemanager import GameStateManager
 from states.simulator import Simulator
+from states.mainmenu import MainMenu
 
 FPS = 30
 
@@ -47,9 +48,10 @@ class Fractals:
     def run(self):
         self.screen = pygame.display.set_mode((0, 0))
 
-        self.gameStateManager = GameStateManager("simulator")
+        self.gameStateManager = GameStateManager("main-menu")
         self.states = {}
         self.states["simulator"] = Simulator(self)
+        self.states["main-menu"] = MainMenu(self)
 
         self.is_running = True
         while self.is_running:

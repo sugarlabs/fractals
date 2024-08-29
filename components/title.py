@@ -22,19 +22,29 @@
 
 import pygame
 
-from utils import Utils
 
-
-class SimulateButton(pygame.sprite.Sprite):
+class Title(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("./assets/simulate-button.png")
+
+        self.logo_img = pygame.image.load("./assets/logo.png")
+        self.logo_img_rect = self.logo_img.get_rect(topleft=(0, 0))
+        self.image = pygame.Surface(self.logo_img.get_size())
         self.rect = self.image.get_rect(center=(x, y))
-        
-    def check_press(self):
-        mouse_pos = pygame.mouse.get_pos()
-        if self.rect.collidepoint(mouse_pos):
-            return True
+
+        self.black_rects = []
+        n = len("fractals")
+        for i in range(n):
+            new_rect = pygame.Rect(self.rect.left + (i * 45), self.rect.top + 42, 45, 42)
+            self.black_rects.append(new_rect)
 
     def update(self):
-        pass
+        self.image.fill("black")
+        self.image.blit(self.logo_img, self.logo_img_rect)
+        mouse_pos = pygame.mouse.get_pos()
+        for rect in self.black_rects:
+            draw_rect = pygame.Rect(rect.left - self.rect.left, rect.top - self.rect.top - 42, 45, 42)
+            if rect.collidepoint(mouse_pos):
+                draw_rect.top += 42
+            
+            pygame.draw.rect(self.image, "black", draw_rect)

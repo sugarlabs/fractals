@@ -24,7 +24,7 @@ import pygame
 import math
 
 from components.slider import Slider
-from components.simulatebutton import SimulateButton
+from components.button import Button
 from components.fractaliterator import FractalIterator
 
 
@@ -133,6 +133,8 @@ class Simulator:
                 self.draw_fractal()
             if self.fractal_iterator.handle_press():
                 self.change_fractal()
+            if self.home_button.check_press():
+                self.gameStateManager.set_state("main-menu")
         elif pygame.mouse.get_pressed()[0]:
             for slider in self.sliders:
                 slider.update_slider_pos()
@@ -161,16 +163,18 @@ class Simulator:
         for slider in self.sliders:
             slider.draw(self.screen)
         self.screen.blit(self.sim_button.image, self.sim_button.rect)
+        self.screen.blit(self.home_button.image, self.home_button.rect)
         self.screen.blit(self.renderer, self.renderer_rect)
     
     def populate_sidebar(self):
         self.fractal_iterator = FractalIterator(105, 30)
         self.angle_slider = Slider(105, 90, 60, 10, "ANGLE", 180, -180)
         self.thickness_slider = Slider(105, 150, 2, 1, "THICKNESS", 5, 1)
-        self.depth_slider = Slider(105, 210, 7, 1, "DEPTH", 9, 1)
+        self.depth_slider = Slider(105, 210, 7, 1, "DEPTH", 8, 1)
         self.initial_angle_slider = Slider(105, 270, 0, 10, "INITIAL ANGLE", 180, -180)
         self.sliders = [self.angle_slider, self.thickness_slider, self.depth_slider, self.initial_angle_slider]
-        self.sim_button = SimulateButton(105, 330)
+        self.sim_button = Button(105, 330, "./assets/simulate-button.png")
+        self.home_button = Button(165, 330, "./assets/home-button.png")
 
     def run(self):
         self.render()
