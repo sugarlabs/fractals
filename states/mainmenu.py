@@ -34,10 +34,18 @@ class MainMenu:
 
         sw = self.screen.get_width()
         sh = self.screen.get_height()
-        self.logo = Title(sw/2, sh/2 - sh/3)
+        self.logo = Title(sw / 2, sh / 2 - sh / 3)
 
-        self.play_button = MenuButton(sw/2, sh/2, "./assets/play-button-active.png", "./assets/play-button-inactive.png")
-        self.help_button = MenuButton(sw/2, sh/2 + 100, "./assets/help-button-active.png", "./assets/help-button-inactive.png")
+        self.play_button = MenuButton(
+            sw / 2, sh / 2,
+            "./assets/play-button-active.png",
+            "./assets/play-button-inactive.png"
+        )
+        self.help_button = MenuButton(
+            sw / 2, sh / 2 + 100,
+            "./assets/help-button-active.png",
+            "./assets/help-button-inactive.png"
+        )
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:

@@ -20,36 +20,36 @@
 # Contact information:
 # Vaibhav Sangwan    sangwanvaibhav02@gmail.com
 
-import math
 import pygame
 
 font_l = pygame.font.Font("./fonts/m04b.ttf", 20)
 font_m = pygame.font.Font("./fonts/m04b.ttf", 16)
 font_s = pygame.font.Font("./fonts/m04b.ttf", 10)
 
+
 class Utils:
     @staticmethod
-    def render_multiple_lines(text, surface, right_margin, pos, color, font, line_height=5):
-        rect = surface.get_rect()
-        bound = rect.right - right_margin
+    def render_multiple_lines(text, surf, r_margin, pos, col, font, line_h=5):
+        rect = surf.get_rect()
+        bound = rect.right - r_margin
         x, y = pos
         space = font.size(' ')[0]
 
         words = [line.split() for line in text.split('\n')]
         for line in words:
             for word in line:
-                word_surf = font.render(word, False, color)
+                word_surf = font.render(word, False, col)
                 word_width, word_height = word_surf.get_size()
                 if x + word_width > bound:
                     x = pos[0]
-                    y += word_height + line_height - 2
+                    y += word_height + line_h - 2
 
-                surface.blit(word_surf, (x, y))
+                surf.blit(word_surf, (x, y))
                 x += word_width + space
 
             x = pos[0]
-            y += word_height + line_height
-    
+            y += word_height + line_h
+
     @staticmethod
     def get_font_and_line_height(screen):
         sw = screen.get_width()

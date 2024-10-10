@@ -35,7 +35,9 @@ class Title(pygame.sprite.Sprite):
         self.black_rects = []
         n = len("fractals")
         for i in range(n):
-            new_rect = pygame.Rect(self.rect.left + (i * 45), self.rect.top + 42, 45, 42)
+            new_rect = pygame.Rect(
+                self.rect.left + (i * 45), self.rect.top + 42, 45, 42
+            )
             self.black_rects.append(new_rect)
 
     def update(self):
@@ -43,8 +45,12 @@ class Title(pygame.sprite.Sprite):
         self.image.blit(self.logo_img, self.logo_img_rect)
         mouse_pos = pygame.mouse.get_pos()
         for rect in self.black_rects:
-            draw_rect = pygame.Rect(rect.left - self.rect.left, rect.top - self.rect.top - 42, 45, 42)
+            draw_rect = pygame.Rect(
+                rect.left - self.rect.left,
+                rect.top - self.rect.top - 42,
+                45,
+                42
+            )
             if rect.collidepoint(mouse_pos):
                 draw_rect.top += 42
-            
             pygame.draw.rect(self.image, "black", draw_rect)

@@ -30,11 +30,13 @@ class FractalIterator(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.bg = pygame.image.load("./assets/fractal-title-bg.png")
-        self.bg_rect = self.bg.get_rect(topleft = (0, 0))
+        self.bg_rect = self.bg.get_rect(topleft=(0, 0))
         self.image = pygame.Surface(self.bg.get_size())
         self.rect = self.image.get_rect(center=(x, y))
         self.left_rect = pygame.Rect(self.rect.x + 5, self.rect.y + 18, 5, 7)
-        self.right_rect = pygame.Rect(self.rect.x + 190, self.rect.y + 18, 5, 7)
+        self.right_rect = pygame.Rect(
+            self.rect.x + 190, self.rect.y + 18, 5, 7
+        )
 
         self.fractals = {
             "snowflake": {
@@ -53,7 +55,7 @@ class FractalIterator(pygame.sprite.Sprite):
             "dragon": {
                 "sentence": "X",
                 "rules": {
-                    "X" : "F-F-F+F+FX++F-F-F+F+FX--F-F-F+F+FX",
+                    "X": "F-F-F+F+FX++F-F-F+F+FX--F-F-F+F+FX",
                     "F": ""
                 },
                 "params": {
@@ -124,7 +126,7 @@ class FractalIterator(pygame.sprite.Sprite):
                     "B": "+AF-BFB-FA+",
                     "C": ""
                 },
-                "params" : {
+                "params": {
                     "angle": 90,
                     "length": 1,
                     "iterations": 1,
@@ -136,10 +138,10 @@ class FractalIterator(pygame.sprite.Sprite):
         self.index = 0
         self.fractal_list = [key for key in self.fractals.keys()]
         self.update_text()
-    
+
     def get_curr_fractal(self):
         return self.fractals[self.fractal_list[self.index]]
-        
+
     def handle_press(self):
         mouse_pos = pygame.mouse.get_pos()
         if self.left_rect.collidepoint(mouse_pos):
@@ -155,11 +157,15 @@ class FractalIterator(pygame.sprite.Sprite):
             self.update_text()
             return True
         return False
-    
+
     def update_text(self):
-        self.text = font_l.render(self.fractal_list[self.index], False, "black")
-        self.text_rect = self.text.get_rect(center=(self.rect.width/2, self.rect.height/2))
-    
+        self.text = font_l.render(
+            self.fractal_list[self.index], False, "black"
+        )
+        self.text_rect = self.text.get_rect(
+            center=(self.rect.width / 2, self.rect.height / 2)
+        )
+
     def draw(self, screen):
         self.image.fill("black")
         self.image.blit(self.bg, self.bg_rect)

@@ -35,16 +35,20 @@ class Slider(pygame.sprite.Sprite):
         self.max_val = max_val
         self.min_val = min_val
         self.bg = pygame.image.load("./assets/slider-bg.png")
-        self.bg_rect = self.bg.get_rect(topleft = (0, 0))
+        self.bg_rect = self.bg.get_rect(topleft=(0, 0))
         self.image = pygame.Surface(self.bg.get_size())
         self.slider_ball_image = pygame.image.load("./assets/slider-ball.png")
         self.rect = self.image.get_rect(center=(x, y))
         self.up_rect = pygame.Rect(self.rect.x + 188, self.rect.y + 26, 6, 4)
         self.down_rect = pygame.Rect(self.rect.x + 188, self.rect.y + 34, 6, 4)
-        self.slider_ball_rect = self.slider_ball_image.get_rect(topleft = (3, 23))
-        self.slider_area_rect = pygame.Rect(self.rect.x, self.rect.y + 21, 143, 22)
+        self.slider_ball_rect = self.slider_ball_image.get_rect(
+            topleft=(3, 23)
+        )
+        self.slider_area_rect = pygame.Rect(
+            self.rect.x, self.rect.y + 21, 143, 22
+        )
         self.recalibrate_slider_pos()
-        
+
     def handle_press(self):
         mouse_pos = pygame.mouse.get_pos()
         if self.up_rect.collidepoint(mouse_pos):
@@ -57,30 +61,33 @@ class Slider(pygame.sprite.Sprite):
             if self.val <= self.min_val:
                 self.val = self.min_val
             self.recalibrate_slider_pos()
-    
+
     def recalibrate_slider_pos(self):
-        centerx = self.rect.x + 12 + (self.val - self.min_val)/(self.max_val - self.min_val) * (134 - 12)
+        prop = (self.val - self.min_val) / (self.max_val - self.min_val)
+        centerx = self.rect.x + 12 + prop * (134 - 12)
         self.slider_ball_rect.centerx = centerx
-    
+
     def update_slider_pos(self):
         mouse_pos = pygame.mouse.get_pos()
         if self.slider_area_rect.collidepoint(mouse_pos):
             centerx = mouse_pos[0] - self.rect.x
             centerx = min(centerx, self.rect.x + 134)
             centerx = max(centerx, self.rect.x + 12)
-
-            self.val = round(self.min_val + (centerx - self.rect.x - 12)/(134-12) * (self.max_val - self.min_val))
+            prop = (centerx - self.rect.x - 12) / (134 - 12)
+            self.val = round(
+                self.min_val + prop * (self.max_val - self.min_val)
+            )
             self.recalibrate_slider_pos()
-    
+
     def draw(self, screen):
         self.image.fill("black")
         self.image.blit(self.bg, self.bg_rect)
         self.image.blit(self.slider_ball_image, self.slider_ball_rect)
         text = font_s.render("" + (str)(self.val), False, "black")
-        text_rect = text.get_rect(midleft = (149, 32))
+        text_rect = text.get_rect(midleft=(149, 32))
         self.image.blit(text, text_rect)
         text = font_l.render(self.feat_name, False, "black")
-        text_rect = text.get_rect(center = (100, 11))
+        text_rect = text.get_rect(center=(100, 11))
         self.image.blit(text, text_rect)
         screen.blit(self.image, self.rect)
 

@@ -45,6 +45,7 @@ generate.
 Change this to set the overall orientation of the fractal.
 """
 
+
 class HelpMenu:
     def __init__(self, game):
         self.screen = game.screen
@@ -53,18 +54,38 @@ class HelpMenu:
 
         sw = self.screen.get_width()
         sh = self.screen.get_height()
-        self.logo = Title(sw/2, 60)
+        self.logo = Title(sw / 2, 60)
 
         self.home_button = Button(0, 0, "./assets/home-button.png")
-        self.home_button.image = pygame.transform.scale_by(self.home_button.image, 1.5)
-        self.home_button.rect = self.home_button.image.get_rect(center=(sw/2 - 220, 80))
+        self.home_button.image = pygame.transform.scale_by(
+            self.home_button.image, 1.5
+        )
+        self.home_button.rect = self.home_button.image.get_rect(
+            center=(sw / 2 - 220, 80)
+        )
 
         self.help_surf = pygame.Surface((sw - 20, sh - 110))
-        pygame.draw.rect(self.help_surf, "white", pygame.Rect(5, 5, self.help_surf.get_width() - 10, self.help_surf.get_height() - 10), 2)
+        pygame.draw.rect(
+            self.help_surf, "white",
+            pygame.Rect(
+                5,
+                5,
+                self.help_surf.get_width() - 10,
+                self.help_surf.get_height() - 10
+            ),
+            2
+        )
         self.help_rect = self.help_surf.get_rect(topleft=(10, 110))
 
-        self.font, self.line_height = Utils.get_font_and_line_height(self.screen)
-        Utils.render_multiple_lines(content, self.help_surf, 30, (30, 30), "white", self.font, self.line_height)
+        self.font, self.line_height = Utils.get_font_and_line_height(
+            self.screen
+        )
+        Utils.render_multiple_lines(
+            content,
+            self.help_surf,
+            30, (30, 30), "white",
+            self.font, self.line_height
+        )
 
     def render(self):
         self.screen.fill("black")
